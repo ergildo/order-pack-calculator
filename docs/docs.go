@@ -85,6 +85,36 @@ const docTemplate = `{
             }
         },
         "/api/v1/packsizes": {
+            "get": {
+                "description": "Get All pack sizes",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "packsizes"
+                ],
+                "summary": "Get All pack sizes",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/dto.PackSizeResponse"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    }
+                }
+            },
             "post": {
                 "description": "Creates new pack sizes",
                 "consumes": [
@@ -191,12 +221,17 @@ const docTemplate = `{
         },
         "dto.CreatePackSizeRequest": {
             "type": "object",
+            "required": [
+                "product_id",
+                "size"
+            ],
             "properties": {
                 "product_id": {
                     "type": "integer"
                 },
                 "size": {
-                    "type": "integer"
+                    "type": "integer",
+                    "minimum": 1
                 }
             }
         },
@@ -258,6 +293,9 @@ const docTemplate = `{
         },
         "dto.UpdatePackSizeRequest": {
             "type": "object",
+            "required": [
+                "id"
+            ],
             "properties": {
                 "active": {
                     "type": "boolean"
@@ -266,7 +304,8 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "size": {
-                    "type": "integer"
+                    "type": "integer",
+                    "minimum": 1
                 }
             }
         }

@@ -15,7 +15,11 @@ definitions:
       product_id:
         type: integer
       size:
+        minimum: 1
         type: integer
+    required:
+    - product_id
+    - size
     type: object
   dto.ErrorResponse:
     properties:
@@ -60,7 +64,10 @@ definitions:
       id:
         type: integer
       size:
+        minimum: 1
         type: integer
+    required:
+    - id
     type: object
 info:
   contact: {}
@@ -111,6 +118,26 @@ paths:
       tags:
       - orders
   /api/v1/packsizes:
+    get:
+      consumes:
+      - application/json
+      description: Get All pack sizes
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dto.PackSizeResponse'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: Get All pack sizes
+      tags:
+      - packsizes
     patch:
       consumes:
       - application/json
