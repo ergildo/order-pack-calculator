@@ -65,6 +65,21 @@ func (mr *MockPackSizeServiceMockRecorder) Create(arg0, arg1 interface{}) *gomoc
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockPackSizeService)(nil).Create), arg0, arg1)
 }
 
+// GetAll mocks base method.
+func (m *MockPackSizeService) GetAll(ctx context.Context) ([]dto.PackSizeResponse, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetAll", ctx)
+	ret0, _ := ret[0].([]dto.PackSizeResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetAll indicates an expected call of GetAll.
+func (mr *MockPackSizeServiceMockRecorder) GetAll(ctx interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAll", reflect.TypeOf((*MockPackSizeService)(nil).GetAll), ctx)
+}
+
 // Update mocks base method.
 func (m *MockPackSizeService) Update(arg0 context.Context, arg1 dto.UpdatePackSizeRequest) error {
 	m.ctrl.T.Helper()

@@ -20,6 +20,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 	v1 := api.Group("/v1")
 
 	packsizes := v1.Group("/packsizes")
+	packsizes.GET("/", s.GetAllPackSizeHandler)
 	packsizes.POST("/", s.CreatePackSizeHandler)
 	packsizes.PATCH("/", s.UpdatePackSizeHandler)
 

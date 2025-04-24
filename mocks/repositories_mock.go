@@ -50,6 +50,21 @@ func (mr *MockPackSizeRepositoryMockRecorder) Create(ctx, pack interface{}) *gom
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockPackSizeRepository)(nil).Create), ctx, pack)
 }
 
+// GetAll mocks base method.
+func (m *MockPackSizeRepository) GetAll(ctx context.Context) ([]entities.PackSize, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetAll", ctx)
+	ret0, _ := ret[0].([]entities.PackSize)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetAll indicates an expected call of GetAll.
+func (mr *MockPackSizeRepositoryMockRecorder) GetAll(ctx interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAll", reflect.TypeOf((*MockPackSizeRepository)(nil).GetAll), ctx)
+}
+
 // GetByID mocks base method.
 func (m *MockPackSizeRepository) GetByID(ctx context.Context, ID int64) (*entities.PackSize, error) {
 	m.ctrl.T.Helper()

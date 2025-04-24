@@ -31,12 +31,9 @@ func (p packSizeService) Create(ctx context.Context, request dto.CreatePackSizeR
 		return nil, fmt.Errorf("could not update pack size. %w", err)
 	}
 
-	return &dto.PackSizeResponse{
-		ID:        saved.ID,
-		ProductID: saved.ProductID,
-		Size:      saved.Size,
-		Active:    saved.Active,
-	}, nil
+	response := dto.PackSizeResponseFromEntity(*saved)
+
+	return &response, nil
 }
 
 func (p packSizeService) Update(ctx context.Context, request dto.UpdatePackSizeRequest) error {
@@ -59,6 +56,15 @@ func (p packSizeService) Update(ctx context.Context, request dto.UpdatePackSizeR
 	}
 
 	return nil
+}
+
+func (p packSizeService) GetAll(ctx context.Context) ([]dto.PackSizeResponse, error) {
+	packSizes, err := p.packSizeRepository.GetAll(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("could not fetch pack size. %w", err)
+	}
+	responses := dto.PackSizeResponseFromEntities(packSizes)
+	return responses, nil
 }
 
 func (p packSizeService) CalcOptimalPacks(ctx context.Context, order dto.CalculatePackSizesRequest) (*dto.OptimalPackSizesResponse, error) {

@@ -100,6 +100,45 @@ func TestGetByID(t *testing.T) {
 	})
 }
 
+func TestGetAll(t *testing.T) {
+	db, mock, _ := sqlmock.New()
+	defer db.Close()
+	repo := NewPackSizeRepository(db)
+
+	t.Run("success", func(t *testing.T) {
+		mock.ExpectQuery(regexp.QuoteMeta("SELECT id, product_id, size, active FROM pack_sizes")).
+			WillReturnRows(sqlmock.NewRows([]string{"id", "product_id", "size", "active"}).AddRow(1, 1, 10, true).AddRow(2, 1, 20, true))
+
+		expected := []entities.PackSize{
+			{
+				ID:        1,
+				ProductID: 1,
+				Size:      10,
+				Active:    true,
+			},
+			{
+				ID:        2,
+				ProductID: 1,
+				Size:      20,
+				Active:    true,
+			},
+		}
+
+		res, err := repo.GetAll(context.Background())
+		assert.NoError(t, err)
+		assert.ElementsMatch(t, expected, res)
+	})
+
+	t.Run("not found", func(t *testing.T) {
+		mock.ExpectQuery(regexp.QuoteMeta("SELECT id, product_id, size, active FROM pack_sizes")).
+			WithArgs(int64(2)).
+			WillReturnError(sql.ErrNoRows)
+
+		_, err := repo.GetByID(context.Background(), 2)
+		assert.ErrorIs(t, err, errs.ErrNotFound)
+	})
+}
+
 func TestGetSizesByProductID(t *testing.T) {
 	db, mock, _ := sqlmock.New()
 	defer db.Close()

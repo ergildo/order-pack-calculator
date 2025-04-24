@@ -17,6 +17,7 @@ type packSizeRepository struct {
 	db *sql.DB
 }
 
+
 func (p packSizeRepository) Create(ctx context.Context, pack entities.PackSize) (*entities.PackSize, error) {
 	query := `
 	INSERT INTO pack_sizes (product_id, size)
@@ -92,4 +93,29 @@ func (p packSizeRepository) GetByID(ctx context.Context, ID int64) (*entities.Pa
 	}
 
 	return &packSize, nil
+}
+
+
+// GetAll implements PackSizeRepository.
+func (p packSizeRepository) GetAll(ctx context.Context) ([]entities.PackSize, error) {
+	query := `
+	SELECT id, product_id, size, active
+	FROM pack_sizes
+`
+rows, err := p.db.QueryContext(ctx, query)
+	if err != nil {
+		return nil, fmt.Errorf("failed to query pack sizes. %w", err)
+	}
+	defer rows.Close()
+
+	var packSizes []entities.PackSize
+	for rows.Next() {
+		var packSize entities.PackSize
+		if err := rows.Scan(&packSize.ID, &packSize.ProductID, &packSize.Size, &packSize.Active); err != nil {
+			return nil, fmt.Errorf("failed to scan pack size row: %w", err)
+		}
+		packSizes = append(packSizes, packSize)
+	}
+
+	return packSizes, nil
 }

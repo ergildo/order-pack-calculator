@@ -43,6 +43,62 @@ func TestCreate(t *testing.T) {
 	})
 }
 
+func TestGetAll(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	repo := mocks.NewMockPackSizeRepository(ctrl)
+	service := NewPackSizeService(repo)
+
+	t.Run("success", func(t *testing.T) {
+
+		saved := []entities.PackSize{
+			{
+				ID:        1,
+				ProductID: 1,
+				Size:      10,
+				Active:    true,
+			},
+			{
+				ID:        2,
+				ProductID: 1,
+				Size:      20,
+				Active:    true,
+			},
+		}
+
+		ctx := context.Background()
+
+		repo.EXPECT().GetAll(ctx).Return(saved, nil)
+
+		expected := []dto.PackSizeResponse{
+			{
+				ID:        1,
+				ProductID: 1,
+				Size:      10,
+				Active:    true,
+			},
+			{
+				ID:        2,
+				ProductID: 1,
+				Size:      20,
+				Active:    true,
+			},
+		}
+
+		resp, err := service.GetAll(ctx)
+
+		assert.NoError(t, err)
+		assert.ElementsMatch(t, expected, resp)
+	})
+
+	t.Run("repository error", func(t *testing.T) {
+		repo.EXPECT().GetAll(gomock.Any()).Return(nil, errors.New("repo error"))
+		_, err := service.GetAll(context.Background())
+		assert.Error(t, err)
+	})
+}
+
 func TestUpdate(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
