@@ -1,0 +1,170 @@
+definitions:
+  dto.CalculatePackSizesRequest:
+    properties:
+      order_quantity:
+        minimum: 1
+        type: integer
+      product_id:
+        type: integer
+    required:
+    - order_quantity
+    - product_id
+    type: object
+  dto.CreatePackSizeRequest:
+    properties:
+      product_id:
+        type: integer
+      size:
+        type: integer
+    type: object
+  dto.ErrorResponse:
+    properties:
+      details:
+        type: string
+      message:
+        type: string
+    type: object
+  dto.OptimalPackSizesResponse:
+    properties:
+      pack_combination:
+        items:
+          $ref: '#/definitions/dto.PackDetail'
+        type: array
+      total_items:
+        type: integer
+      total_packs:
+        type: integer
+    type: object
+  dto.PackDetail:
+    properties:
+      count:
+        type: integer
+      size:
+        type: integer
+    type: object
+  dto.PackSizeResponse:
+    properties:
+      active:
+        type: boolean
+      id:
+        type: integer
+      product_id:
+        type: integer
+      size:
+        type: integer
+    type: object
+  dto.UpdatePackSizeRequest:
+    properties:
+      active:
+        type: boolean
+      id:
+        type: integer
+      size:
+        type: integer
+    type: object
+info:
+  contact: {}
+paths:
+  /api/health:
+    get:
+      description: Returns the health status of the application
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Health check
+      tags:
+      - health
+  /api/v1/orders/calculate:
+    post:
+      consumes:
+      - application/json
+      description: Calculates the optimal pack sizes for a given order
+      parameters:
+      - description: Order details
+        in: body
+        name: order
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CalculatePackSizesRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.OptimalPackSizesResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: Calculate optimal pack sizes
+      tags:
+      - orders
+  /api/v1/packsizes:
+    patch:
+      consumes:
+      - application/json
+      description: Updates existing pack sizes
+      parameters:
+      - description: Updated pack size details
+        in: body
+        name: packSize
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdatePackSizeRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: Update pack sizes
+      tags:
+      - packsizes
+    post:
+      consumes:
+      - application/json
+      description: Creates new pack sizes
+      parameters:
+      - description: Pack size details
+        in: body
+        name: packSize
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreatePackSizeRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.PackSizeResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: Create pack sizes
+      tags:
+      - packsizes
+swagger: "2.0"
