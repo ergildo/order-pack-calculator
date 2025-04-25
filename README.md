@@ -69,6 +69,7 @@ CREATE TABLE IF NOT EXISTS pack_sizes (
 	CONSTRAINT pack_sizes_pkey PRIMARY KEY (id)
 );
 ```
+![Calculate Optimal Pack Flow](docs/diagrams/Solution.drawio.png "Calculate Optimal Pack Flow")
 
 ### Project Structure
 
@@ -143,6 +144,7 @@ make migrate-up
 make up
 
 ```
+Access:[http://localhost:8080/swagger/index.html](https://http://localhost:8080/swagger/index.html)
 
 
 ### CI/CD
