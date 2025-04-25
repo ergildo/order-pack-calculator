@@ -131,6 +131,12 @@ git clone https://github.com/ergildo/order-pack-calculator.git && cd order-pack-
 make dependencies
 
 ```
+3. Start database:
+
+```bash 
+make database-up
+
+```
 
 3. Run migration scrips:
 
@@ -144,7 +150,7 @@ make migrate-up
 make up
 
 ```
-Access:[http://localhost:8080/swagger/index.html](https://http://localhost:8080/swagger/index.html)
+Access:[http://localhost:8080/swagger/index.html](http://localhost:8080/swagger/index.html)
 
 
 ### CI/CD
