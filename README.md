@@ -177,7 +177,7 @@ make database-up
 1. Run the API:
 
 ```bash 
-make up
+make run
 
 ```
 
