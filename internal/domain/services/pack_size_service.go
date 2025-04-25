@@ -11,6 +11,7 @@ import (
 	"order-pack-calculator/internal/domain/repositories"
 )
 
+// Constructor for PackSizeService
 func NewPackSizeService(packSizeRepository repositories.PackSizeRepository) PackSizeService {
 	return packSizeService{packSizeRepository: packSizeRepository}
 }
@@ -19,8 +20,8 @@ type packSizeService struct {
 	packSizeRepository repositories.PackSizeRepository
 }
 
+// Creates a new pack size entry
 func (p packSizeService) Create(ctx context.Context, request dto.CreatePackSizeRequest) (*dto.PackSizeResponse, error) {
-
 	packSize := entities.PackSize{
 		ProductID: request.ProductID,
 		Size:      request.Size,
@@ -32,10 +33,10 @@ func (p packSizeService) Create(ctx context.Context, request dto.CreatePackSizeR
 	}
 
 	response := dto.PackSizeResponseFromEntity(*saved)
-
 	return &response, nil
 }
 
+// Updates an existing pack size
 func (p packSizeService) Update(ctx context.Context, request dto.UpdatePackSizeRequest) error {
 	packSize, err := p.packSizeRepository.GetByID(ctx, request.ID)
 	if err != nil {
@@ -50,7 +51,6 @@ func (p packSizeService) Update(ctx context.Context, request dto.UpdatePackSizeR
 	}
 
 	err = p.packSizeRepository.Update(ctx, *packSize)
-
 	if err != nil {
 		return fmt.Errorf("could not update pack size. %w", err)
 	}
@@ -58,6 +58,7 @@ func (p packSizeService) Update(ctx context.Context, request dto.UpdatePackSizeR
 	return nil
 }
 
+// Retrieves all pack sizes
 func (p packSizeService) GetAll(ctx context.Context) ([]dto.PackSizeResponse, error) {
 	packSizes, err := p.packSizeRepository.GetAll(ctx)
 	if err != nil {
@@ -67,6 +68,7 @@ func (p packSizeService) GetAll(ctx context.Context) ([]dto.PackSizeResponse, er
 	return responses, nil
 }
 
+// Calculate optimal pack sizes for an order
 func (p packSizeService) CalcOptimalPacks(ctx context.Context, order dto.CalculatePackSizesRequest) (*dto.OptimalPackSizesResponse, error) {
 	packSizes, err := p.packSizeRepository.GetSizesByProductID(ctx, int64(order.ProductID))
 	if err != nil {
@@ -77,15 +79,14 @@ func (p packSizeService) CalcOptimalPacks(ctx context.Context, order dto.Calcula
 	return solution, nil
 }
 
+// Core logic: calculates optimal pack combination using dynamic programming
 func (packSizeService) calcOptimalPacks(order dto.CalculatePackSizesRequest, packSizes []int) *dto.OptimalPackSizesResponse {
-
 	maxPackSize := slices.Max(packSizes)
-
 	limit := order.OrderQuantity + maxPackSize
 
-	// dp[i] = best solution for exactly i items
+	// dp[i] holds the best solution to exactly pack i items
 	dp := make([]*dto.OptimalPackSizesResponse, limit+1)
-	dp[0] = &dto.OptimalPackSizesResponse{}
+	dp[0] = &dto.OptimalPackSizesResponse{} // base case: 0 items needs 0 packs
 
 	for i := 0; i <= limit; i++ {
 		if dp[i] == nil {
@@ -97,16 +98,17 @@ func (packSizeService) calcOptimalPacks(order dto.CalculatePackSizesRequest, pac
 				continue
 			}
 
-			// clone current combination
+			// Clone current pack combination and add one more pack of current size
 			newCombo := cloneCombination(dp[i].PackCombination)
 			addToCombination(&newCombo, size)
 
 			newSolution := &dto.OptimalPackSizesResponse{
 				PackCombination: newCombo,
-				TotalItems:      i + size,
+				TotalItems:      next,
 				TotalPacks:      dp[i].TotalPacks + 1,
 			}
 
+			// Update dp[next] if it's a better solution (fewer items or fewer packs)
 			if dp[next] == nil ||
 				newSolution.TotalItems < dp[next].TotalItems ||
 				(newSolution.TotalItems == dp[next].TotalItems && newSolution.TotalPacks < dp[next].TotalPacks) {
@@ -115,7 +117,7 @@ func (packSizeService) calcOptimalPacks(order dto.CalculatePackSizesRequest, pac
 		}
 	}
 
-	// find the best solution with minimal totalItems >= orderQuantity
+	// Find best valid solution with minimum total items >= order quantity
 	best := &dto.OptimalPackSizesResponse{TotalItems: math.MaxInt64}
 	for i := order.OrderQuantity; i <= limit; i++ {
 		if dp[i] != nil && (dp[i].TotalItems < best.TotalItems ||
@@ -125,9 +127,9 @@ func (packSizeService) calcOptimalPacks(order dto.CalculatePackSizesRequest, pac
 	}
 
 	return best
-
 }
 
+// Deep copies a pack combination slice
 func cloneCombination(combo []dto.PackDetail) []dto.PackDetail {
 	var cloned []dto.PackDetail
 	for _, cb := range combo {
@@ -136,6 +138,7 @@ func cloneCombination(combo []dto.PackDetail) []dto.PackDetail {
 	return cloned
 }
 
+// Adds a pack of the given size to the combination (increments if already exists)
 func addToCombination(combo *[]dto.PackDetail, size int) {
 	for i := range *combo {
 		if (*combo)[i].Size == size {
