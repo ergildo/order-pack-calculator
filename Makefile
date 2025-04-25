@@ -10,7 +10,6 @@ dependencies:
 	@go install github.com/golang/mock/mockgen@latest
 	@go install github.com/air-verse/air@latest
 
-
 # Create migration file
 migration:
 	@if [ -z "$(NAME)" ]; then \
@@ -57,6 +56,14 @@ up:
 down:
 	docker-compose down
 
+# Run docker compose
+database-up:
+	docker compose up postgresql-db -d
+
+# Shutdown docker compose
+database-down:
+	docker-compose down postgresql-db
+
 # Test the application
 test:
 	@echo "Testing..."
@@ -85,3 +92,4 @@ watch:
             fi; \
         fi
 
+.PHONY: dependencies migration migrate-up migrate-down build generate-mocks generate-docs run up down database-up database-down test clean watch
